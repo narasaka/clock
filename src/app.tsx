@@ -12,6 +12,7 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import { getTimezonesWithOffsets } from "~/lib/utils";
+import { GuideDialog } from "./components/guide-dialog";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -28,7 +29,7 @@ function App() {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [selectedTimezone]);
 
   return (
     <main className="flex h-dvh flex-col bg-background p-4">
@@ -53,10 +54,21 @@ function App() {
       </header>
       <div className="flex grow flex-col items-center justify-center">
         <QRCode
-          value={currentTime.format("hh:mm:ss a")}
+          value={currentTime.format("hh:mm:ss A")}
           className="aspect-square w-full max-w-2xl p-1"
         />
       </div>
+      <footer className="mx-auto w-full max-w-2xl space-y-1 font-mono text-sm">
+        <GuideDialog />
+        <a
+          href="https://github.com/narasaka/clock"
+          target="_blank"
+          rel="noreferrer"
+          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
+        >
+          {"> source code"}
+        </a>
+      </footer>
     </main>
   );
 }
