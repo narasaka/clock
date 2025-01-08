@@ -1,14 +1,30 @@
 import { useEffect, useState } from "react";
-import { QRCode } from "./components/qrcode";
-import { ThemeSwitcher } from "./components/theme-switcher";
+import { QRCode } from "~/components/qrcode";
+import { ThemeSwitcher } from "~/components/theme-switcher";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+} from "~/components/ui/select";
+import { SelectValue } from "@radix-ui/react-select";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+import { getTimezonesWithOffsets } from "~/lib/utils";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 function App() {
-  const [currentTime, setCurrentTime] = useState("");
+  const [selectedTimezone, setSelectedTimezone] = useState(dayjs.tz.guess());
+  const [currentTime, setCurrentTime] = useState(dayjs().tz(selectedTimezone));
+  const timezones = getTimezonesWithOffsets();
 
   useEffect(() => {
     const interval = setInterval(() => {
-      const now = new Date();
-      setCurrentTime(now.toTimeString());
+      const now = dayjs().tz(selectedTimezone);
+      setCurrentTime(now);
     }, 1000);
 
     return () => clearInterval(interval);
@@ -16,13 +32,29 @@ function App() {
 
   return (
     <main className="flex h-dvh flex-col bg-background p-4">
-      <header className="flex w-full max-w-5xl flex-row-reverse">
+      <header className="mx-auto flex w-full max-w-2xl gap-2">
+        <Select
+          onValueChange={(value) => {
+            setSelectedTimezone(value);
+          }}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Timezone" />
+          </SelectTrigger>
+          <SelectContent>
+            {timezones.map((timezone) => (
+              <SelectItem value={timezone.timezone}>
+                {timezone.timezone} (GMT{timezone.offset})
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         <ThemeSwitcher />
       </header>
       <div className="flex grow flex-col items-center justify-center">
         <QRCode
-          value={currentTime}
-          className="aspect-square w-full max-w-2xl p-12"
+          value={currentTime.format("hh:mm:ss a")}
+          className="aspect-square w-full max-w-2xl p-1"
         />
       </div>
     </main>
