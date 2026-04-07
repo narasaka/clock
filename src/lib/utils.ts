@@ -27,3 +27,33 @@ export function getTimezonesWithOffsets() {
   }
   return result;
 }
+
+export function filterTimezones(
+  timezones: TimezoneWithOffset[],
+  query: string,
+): TimezoneWithOffset[] {
+  if (!query.trim()) return timezones;
+
+  const normalizedQuery = query.toLowerCase().trim();
+  const cleanedQuery = normalizedQuery.replace(/^gmt/, "");
+  const searchTerms = cleanedQuery.split(/\s+/);
+
+  return timezones.filter((tz) => {
+    const timezoneLower = tz.timezone.toLowerCase();
+    const offsetLower = tz.offset.toLowerCase();
+    const offsetNumeric = offsetLower
+      .replace(":00", "")
+      .replace("+", "")
+      .replace("-", "");
+    const offsetShort = offsetLower.replace(":00", "");
+
+    const searchableText = [
+      timezoneLower,
+      offsetLower,
+      offsetShort,
+      offsetNumeric,
+    ].join(" ");
+
+    return searchTerms.every((term) => searchableText.includes(term));
+  });
+}

@@ -1,18 +1,12 @@
 import { useEffect, useState } from "react";
 import { QRCode } from "~/components/qrcode";
 import { ThemeSwitcher } from "~/components/theme-switcher";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-} from "~/components/ui/select";
-import { SelectValue } from "@radix-ui/react-select";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import { getTimezonesWithOffsets } from "~/lib/utils";
 import { GuideDialog } from "./components/guide-dialog";
+import { TimezoneSelect } from "./components/timezone-select";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -34,22 +28,12 @@ function App() {
   return (
     <main className="flex h-dvh flex-col bg-background p-4">
       <header className="mx-auto flex w-full max-w-2xl gap-2">
-        <Select
-          onValueChange={(value) => {
-            setSelectedTimezone(value);
-          }}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Timezone" />
-          </SelectTrigger>
-          <SelectContent>
-            {timezones.map((timezone) => (
-              <SelectItem value={timezone.timezone}>
-                {timezone.timezone} (GMT{timezone.offset})
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <TimezoneSelect
+          timezones={timezones}
+          value={selectedTimezone}
+          onChange={setSelectedTimezone}
+          placeholder="Select timezone..."
+        />
         <ThemeSwitcher />
       </header>
       <div className="flex grow flex-col items-center justify-center">
